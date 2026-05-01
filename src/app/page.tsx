@@ -1,6 +1,15 @@
 import prisma from "@/lib/prisma";
 import SyncButton from "@/components/Syncbutton";
 
+type Show = {
+  id: number;
+  tanggal: Date;
+  tipe: string;
+  setlist: string;
+  ref_code: string;
+  member_name: string;
+};
+
 function formatDate(date: Date) {
   return new Intl.DateTimeFormat("id-ID", {
     weekday: "long",
