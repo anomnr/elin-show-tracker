@@ -1,5 +1,6 @@
 import prisma from "@/lib/prisma";
 import SyncButton from "@/components/Syncbutton";
+import Image from "next/image";
 
 type Show = {
   id: number;
@@ -10,24 +11,24 @@ type Show = {
   member_name: string;
 };
 
-function formatDate(date: Date) {
+function formatDate(date: Date | string) {
   return new Intl.DateTimeFormat("id-ID", {
     weekday: "long",
     day: "2-digit",
     month: "long",
     year: "numeric",
-  }).format(date);
+  }).format(new Date(date));
 }
 
-function formatShortDate(date: Date) {
+function formatShortDate(date: Date | string) {
   return new Intl.DateTimeFormat("id-ID", {
     day: "2-digit",
     month: "short",
-  }).format(date);
+  }).format(new Date(date));
 }
 
 export default async function Home() {
-  const shows = await prisma.show.findMany({
+  const shows: Show[] = await prisma.show.findMany({
     orderBy: {
       tanggal: "desc",
     },
@@ -45,9 +46,11 @@ export default async function Home() {
         <div className="mb-8 overflow-hidden rounded-[2rem] border border-white/10 bg-gradient-to-br from-pink-500/20 via-purple-500/10 to-cyan-400/10 p-6 shadow-2xl md:p-10">
           <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
             <div className="flex items-center gap-6">
-              <img
-                src="images/celline_thefani.jpg"
+              <Image
+                src="/images/celline_thefani.jpg"
                 alt="Elin"
+                width={112}
+                height={112}
                 className="h-24 w-24 rounded-2xl object-cover shadow-xl md:h-28 md:w-28"
               />
 
