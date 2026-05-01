@@ -1,65 +1,157 @@
-import Image from "next/image";
+import prisma from "@/lib/prisma";
+import SyncButton from "@/components/Syncbutton";
 
-export default function Home() {
+function formatDate(date: Date) {
+  return new Intl.DateTimeFormat("id-ID", {
+    weekday: "long",
+    day: "2-digit",
+    month: "long",
+    year: "numeric",
+  }).format(date);
+}
+
+function formatShortDate(date: Date) {
+  return new Intl.DateTimeFormat("id-ID", {
+    day: "2-digit",
+    month: "short",
+  }).format(date);
+}
+
+export default async function Home() {
+  const shows = await prisma.show.findMany({
+    orderBy: {
+      tanggal: "desc",
+    },
+  });
+
+  const totalShows = shows.length;
+  const totalTheater = shows.filter((show) => show.tipe === "SHOW").length;
+  const totalEvent = shows.filter((show) => show.tipe === "EVENT").length;
+
+  const latestShow = shows[0];
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <main className="min-h-screen bg-[#0b0b12] text-white">
+      <section className="mx-auto max-w-6xl px-5 py-8 md:py-12">
+        <div className="mb-8 overflow-hidden rounded-[2rem] border border-white/10 bg-gradient-to-br from-pink-500/20 via-purple-500/10 to-cyan-400/10 p-6 shadow-2xl md:p-10">
+          <div className="flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
+            <div className="flex items-center gap-6">
+              <img
+                src="images/celline_thefani.jpg"
+                alt="Elin"
+                className="h-24 w-24 rounded-2xl object-cover shadow-xl md:h-28 md:w-28"
+              />
+
+              <div>
+                <p className="mb-2 inline-flex rounded-full border border-pink-300/30 bg-pink-400/10 px-3 py-1 text-xs text-pink-200">
+                  Elin Show Tracker
+                </p>
+
+                <h1 className="text-3xl font-black md:text-5xl">
+                  Celline Thefani
+                </h1>
+
+                <p className="mt-2 text-sm text-white/70">
+                  Tracker jadwal theater dan event Elin dari JKT48
+                </p>
+              </div>
+            </div>
+            <SyncButton/>
+          </div>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+
+        <div className="mb-8 grid gap-4 md:grid-cols-4">
+          <div className="rounded-3xl border border-white/10 bg-white/[0.06] p-5">
+            <p className="text-sm text-white/50">Total Jadwal</p>
+            <p className="mt-2 text-3xl font-black">{totalShows}</p>
+          </div>
+
+          <div className="rounded-3xl border border-white/10 bg-white/[0.06] p-5">
+            <p className="text-sm text-white/50">Theater Show</p>
+            <p className="mt-2 text-3xl font-black">{totalTheater}</p>
+          </div>
+
+          <div className="rounded-3xl border border-white/10 bg-white/[0.06] p-5">
+            <p className="text-sm text-white/50">Event</p>
+            <p className="mt-2 text-3xl font-black">{totalEvent}</p>
+          </div>
+
+          <div className="rounded-3xl border border-white/10 bg-white/[0.06] p-5">
+            <p className="text-sm text-white/50">Terbaru</p>
+            <p className="mt-2 truncate text-lg font-bold">
+              {latestShow ? latestShow.setlist : "-"}
+            </p>
+          </div>
         </div>
-      </main>
-    </div>
+
+        <div className="mb-5 flex items-center justify-between">
+          <div>
+            <h2 className="text-2xl font-black">Riwayat Penampilan</h2>
+            <p className="mt-1 text-sm text-white/50">
+              Semua data yang sudah tersimpan di database.
+            </p>
+          </div>
+        </div>
+
+        {shows.length === 0 ? (
+          <div className="rounded-3xl border border-dashed border-white/20 bg-white/[0.04] p-10 text-center">
+            <p className="text-lg font-bold">Belum ada data</p>
+            <p className="mt-2 text-sm text-white/50">
+              Klik tombol Sync Sekarang untuk mengambil jadwal terbaru.
+            </p>
+          </div>
+        ) : (
+          <div className="grid gap-4">
+            {shows.map((show) => (
+              <article
+                key={show.id}
+                className="group overflow-hidden rounded-3xl border border-white/10 bg-white/[0.06] p-5 transition hover:-translate-y-1 hover:bg-white/[0.09] hover:shadow-2xl"
+              >
+                <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+                  <div className="flex gap-4">
+                    <div className="flex h-16 w-16 shrink-0 flex-col items-center justify-center rounded-2xl bg-gradient-to-br from-pink-400 to-purple-500 text-center shadow-lg">
+                      <span className="text-xs font-bold uppercase">
+                        {formatShortDate(show.tanggal).split(" ")[1]}
+                      </span>
+                      <span className="text-2xl font-black">
+                        {formatShortDate(show.tanggal).split(" ")[0]}
+                      </span>
+                    </div>
+
+                    <div>
+                      <div className="mb-2 flex flex-wrap items-center gap-2">
+                        <span
+                          className={`rounded-full px-3 py-1 text-xs font-bold ${
+                            show.tipe === "SHOW"
+                              ? "bg-pink-400/15 text-pink-200"
+                              : "bg-cyan-400/15 text-cyan-200"
+                          }`}
+                        >
+                          {show.tipe}
+                        </span>
+
+                        <span className="rounded-full bg-white/10 px-3 py-1 text-xs text-white/60">
+                          {show.ref_code}
+                        </span>
+                      </div>
+
+                      <h3 className="text-xl font-black">{show.setlist}</h3>
+
+                      <p className="mt-1 text-sm text-white/50">
+                        {formatDate(show.tanggal)}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="rounded-full border border-white/10 px-4 py-2 text-sm text-white/50">
+                    {show.member_name}
+                  </div>
+                </div>
+              </article>
+            ))}
+          </div>
+        )}
+      </section>
+    </main>
   );
 }

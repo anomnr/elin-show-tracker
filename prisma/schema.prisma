@@ -1,0 +1,20 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Show {
+  id          Int      @id @default(autoincrement())
+  tanggal     DateTime
+  tipe        String
+  setlist     String
+  ref_code    String   @unique
+  member_name String   @default("Elin")
+
+  created_at  DateTime @default(now())
+
+  @@map("show")
+}
